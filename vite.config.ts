@@ -9,12 +9,15 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1200,
+    target: 'es2020',
+    minify: false,
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'supabase': ['@supabase/supabase-js'],
           'icons': ['lucide-react'],
+          'pdf-libs': ['html2canvas', 'jspdf'],
         },
       },
     },
