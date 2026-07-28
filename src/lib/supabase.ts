@@ -17,6 +17,9 @@ export type Project = {
   accent: string;
   sort_order: number;
   created_at: string;
+  source: string | null;
+  github_repo_id: string | null;
+  last_synced: string | null;
 };
 
 export type Certificate = {

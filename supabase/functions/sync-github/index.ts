@@ -26,6 +26,20 @@ interface GitHubRepo {
   pushed_at: string;
 }
 
+function formatPeriod(pushedAt: string): string {
+  const d = new Date(pushedAt);
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function buildImpact(repo: GitHubRepo): string {
+  const parts: string[] = [];
+  if (repo.language) parts.push(`${repo.language} project`);
+  if (repo.stars > 0) parts.push(`${repo.stars} star${repo.stars === 1 ? "" : "s"}`);
+  if (repo.forks > 0) parts.push(`${repo.forks} fork${repo.forks === 1 ? "" : "s"}`);
+  if (repo.topics.length > 0) parts.push(`${repo.topics.length} topics`);
+  return parts.length ? `GitHub: ${parts.join(" • ")}` : "Synced from GitHub";
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -37,7 +51,6 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Check if we synced recently (unless force=true is passed)
     const url = new URL(req.url);
     const force = url.searchParams.get("force") === "true";
 
@@ -60,7 +73,6 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Fetch all public repos (paginated)
     const githubHeaders: Record<string, string> = {
       "User-Agent": "nithin-portfolio-sync/1.0",
       "Accept": "application/vnd.github+json",
@@ -85,7 +97,6 @@ Deno.serve(async (req: Request) => {
       page++;
     }
 
-    // Fetch languages for each repo (sequentially to respect rate limits)
     const rows = [];
     const now = new Date().toISOString();
 
@@ -95,7 +106,7 @@ Deno.serve(async (req: Request) => {
         const langRes = await fetch(repo.languages_url, { headers: githubHeaders });
         if (langRes.ok) languages = await langRes.json();
       } catch {
-        // best-effort; continue without languages
+        // best-effort
       }
 
       rows.push({
@@ -123,14 +134,61 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { error } = await supabase
+    const { error: repoError } = await supabase
       .from("github_repos")
       .upsert(rows, { onConflict: "id" });
 
-    if (error) throw new Error(`Supabase upsert error: ${error.message}`);
+    if (repoError) throw new Error(`Supabase upsert error (github_repos): ${repoError.message}`);
+
+    // ── Sync into projects table for resume + projects section ──
+    const projectRows = repos.map((repo, idx) => {
+      const langKeys = repo.language ? [repo.language] : [];
+      const topicTags = repo.topics?.slice(0, 4) ?? [];
+      const tags = Array.from(new Set([...langKeys, ...topicTags])).slice(0, 6);
+
+      return {
+        title: repo.name,
+        description: repo.description || `${repo.name} — repository on GitHub`,
+        tags,
+        period: formatPeriod(repo.pushed_at),
+        github_url: repo.html_url,
+        live_url: repo.homepage?.trim() || null,
+        impact: buildImpact(repo),
+        accent: "neon-cyan",
+        sort_order: 1000 + idx,
+        source: "github",
+        github_repo_id: repo.full_name,
+        last_synced: now,
+      };
+    });
+
+    const { error: projError } = await supabase
+      .from("projects")
+      .upsert(projectRows, { onConflict: "github_repo_id" });
+
+    if (projError) throw new Error(`Supabase upsert error (projects): ${projError.message}`);
+
+    // Remove stale synced projects (repos that no longer exist publicly)
+    const syncedIds = repos.map((r) => r.full_name);
+    const { data: existingSynced } = await supabase
+      .from("projects")
+      .select("id, github_repo_id")
+      .eq("source", "github");
+
+    if (existingSynced) {
+      const stale = existingSynced.filter((p) => p.github_repo_id && !syncedIds.includes(p.github_repo_id));
+      if (stale.length > 0) {
+        await supabase.from("projects").delete().in("id", stale.map((p) => p.id));
+      }
+    }
 
     return new Response(
-      JSON.stringify({ message: "Sync complete", synced: rows.length, timestamp: now }),
+      JSON.stringify({
+        message: "Sync complete",
+        synced: rows.length,
+        projects_synced: projectRows.length,
+        timestamp: now,
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
