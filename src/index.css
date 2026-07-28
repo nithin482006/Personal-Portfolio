@@ -1,0 +1,459 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply font-sans antialiased;
+    background: #0a0a0f;
+    color: #e5e5e5;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgba(0, 255, 136, 0.3);
+    color: #00ff88;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0a0f; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00ff88 0%, #00cc6a 100%);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #00ff88; }
+
+  /* Fluid typography */
+  h1 { font-size: clamp(2rem, 6vw, 3.75rem); }
+  h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+  h3 { font-size: clamp(1.125rem, 2.5vw, 1.375rem); }
+
+  /* Prevent horizontal scroll from any decorator */
+  * { max-width: 100%; }
+  img, video, canvas, svg { max-width: 100%; height: auto; }
+}
+
+@layer utilities {
+  /* ── Scroll reveal ───────────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .reveal-left {
+    opacity: 0; transform: translateX(-24px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  .reveal-right {
+    opacity: 0; transform: translateX(24px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* ── Glitch text effect ─────────────────────────────────────── */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .glitch:hover::before {
+    opacity: 1;
+    color: #00ff88;
+    clip-path: inset(30% 0 55% 0);
+    animation: glitch-before 0.3s steps(2) forwards;
+  }
+  .glitch:hover::after {
+    opacity: 1;
+    color: #00fff2;
+    clip-path: inset(60% 0 20% 0);
+    animation: glitch-after 0.3s steps(2) 0.05s forwards;
+  }
+
+  /* ── Cyber card with scan effect ────────────────────────────── */
+  .cyber-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(13,13,20,0.9) 0%, rgba(18,18,26,0.95) 100%);
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    backdrop-filter: blur(10px);
+  }
+  .cyber-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
+  }
+  .cyber-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,255,136,0.03) 0%, transparent 30%);
+    pointer-events: none;
+  }
+  .cyber-card:hover {
+    border-color: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.1), inset 0 0 20px rgba(0, 255, 136, 0.02);
+  }
+
+  /* ── Scan line animation on hover ───────────────────────────── */
+  .scan-effect::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,255,136,0.08) 50%, transparent 100%);
+    transform: translateY(-100%);
+    transition: none;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .scan-effect:hover::before {
+    animation: scanline 0.8s ease forwards;
+  }
+
+  /* ── Terminal cursor ────────────────────────────────────────── */
+  .terminal-cursor::after {
+    content: '█';
+    display: inline-block;
+    margin-left: 2px;
+    color: #00ff88;
+    animation: cursor-blink 1s step-end infinite;
+  }
+
+  /* ── Neon glow effects ──────────────────────────────────────── */
+  .neon-text {
+    text-shadow:
+      0 0 10px rgba(0, 255, 136, 0.7),
+      0 0 20px rgba(0, 255, 136, 0.5),
+      0 0 40px rgba(0, 255, 136, 0.3);
+  }
+  .neon-text-cyan {
+    text-shadow:
+      0 0 10px rgba(0, 255, 242, 0.7),
+      0 0 20px rgba(0, 255, 242, 0.5),
+      0 0 40px rgba(0, 255, 242, 0.3);
+  }
+  .neon-border {
+    box-shadow:
+      0 0 10px rgba(0, 255, 136, 0.2),
+      0 0 20px rgba(0, 255, 136, 0.1),
+      inset 0 0 10px rgba(0, 255, 136, 0.05);
+  }
+
+  /* ── Glassmorphism card ─────────────────────────────────────── */
+  .glass-card {
+    background: rgba(13, 13, 20, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* ── Grid background ────────────────────────────────────────── */
+  .cyber-grid {
+    background-image:
+      linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* ── Hex pattern background ─────────────────────────────────── */
+  .hex-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3z' fill='none' stroke='%2300ff88' stroke-width='0.3' stroke-opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 60px 52px;
+  }
+
+  /* ── Pulse ring animation ───────────────────────────────────── */
+  .cyber-pulse {
+    position: relative;
+  }
+  .cyber-pulse::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    animation: cyber-ring 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ── Status indicator ───────────────────────────────────────── */
+  .status-online {
+    position: relative;
+  }
+  .status-online::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #00ff88;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00ff88;
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+
+  /* ── Terminal window styling ────────────────────────────────── */
+  .terminal-window {
+    background: linear-gradient(180deg, #0c0c14 0%, #0a0a0f 100%);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .terminal-header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+  }
+  .terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .terminal-body {
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #00ff88;
+    line-height: 1.6;
+  }
+
+  /* ── Case file styling ─────────────────────────────────────── */
+  .case-file {
+    position: relative;
+    background: linear-gradient(135deg, #0d0d14 0%, #12121a 100%);
+    border: 1px solid rgba(0, 255, 136, 0.1);
+    overflow: hidden;
+  }
+  .case-file::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00ff88, #00fff2, #00ff88);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  .case-file-header {
+    background: rgba(0, 255, 136, 0.05);
+    border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #00ff88;
+  }
+
+  /* ── Skill badge ────────────────────────────────────────────── */
+  .skill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: rgba(0, 255, 136, 0.08);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #00ff88;
+    transition: all 0.2s ease;
+  }
+  .skill-badge:hover {
+    background: rgba(0, 255, 136, 0.15);
+    border-color: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  }
+
+  /* ── Timeline dot with glow ────────────────────────────────── */
+  .timeline-dot {
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #00ff88;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00ff88, 0 0 20px rgba(0, 255, 136, 0.4);
+  }
+  .timeline-dot.inactive {
+    background: #1a1a2e;
+    box-shadow: none;
+    border: 2px solid rgba(0, 255, 136, 0.3);
+  }
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────── */
+
+@keyframes glitch-before {
+  0%   { transform: translate(0); }
+  20%  { transform: translate(-4px, 2px); clip-path: inset(15% 0 75% 0); }
+  40%  { transform: translate(4px, -2px); clip-path: inset(55% 0 25% 0); }
+  60%  { transform: translate(-3px, 1px); clip-path: inset(35% 0 45% 0); }
+  80%  { transform: translate(3px, -1px); clip-path: inset(75% 0 10% 0); }
+  100% { transform: translate(0); opacity: 0; }
+}
+
+@keyframes glitch-after {
+  0%   { transform: translate(0); }
+  25%  { transform: translate(4px, -1px); clip-path: inset(45% 0 35% 0); }
+  50%  { transform: translate(-4px, 2px); clip-path: inset(15% 0 70% 0); }
+  75%  { transform: translate(2px, -2px); clip-path: inset(65% 0 20% 0); }
+  100% { transform: translate(0); opacity: 0; }
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes cyber-ring {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50%      { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+  50%      { opacity: 0.5; transform: translateY(-50%) scale(1.3); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeUp {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ── Timeline connector ───────────────────────────────────────────── */
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 22px;
+  bottom: -20px;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(0,255,136,0.4), rgba(0,255,136,0.1));
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal, .reveal-left, .reveal-right {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .glitch::before, .glitch::after { display: none !important; }
+}
+
+/* ── Touch target minimum (44×44) ─────────────────────────────────── */
+@media (pointer: coarse) {
+  .touch-target { min-width: 44px; min-height: 44px; }
+}
+
+/* ── Fluid section spacing ────────────────────────────────────────── */
+.section-pad { padding-top: clamp(4rem, 10vw, 6rem); padding-bottom: clamp(4rem, 10vw, 6rem); }
+
+/* ── Terminal entrance animations ─────────────────────────────────── */
+@keyframes terminalSlideUp {
+  0%   { opacity: 0; transform: translateY(100%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes terminalScaleIn {
+  0%   { opacity: 0; transform: scale(0.92) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes terminalFadeOut {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.96); }
+}
+@keyframes terminalSlideDown {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(60vh) scale(0.6); }
+}
+@keyframes terminalSlideToDock {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.3) translateX(200px) translateY(200px); }
+}
+.terminal-enter-mobile  { animation: terminalSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.terminal-enter-desktop { animation: terminalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.terminal-exit          { animation: terminalFadeOut 0.22s ease both; }
+.terminal-exit-minimize-mobile  { animation: terminalSlideDown 0.25s cubic-bezier(0.4, 0, 0.6, 1) both; }
+.terminal-exit-minimize-desktop { animation: terminalSlideToDock 0.25s cubic-bezier(0.4, 0, 0.6, 1) both; }
+
+/* Backdrop fade */
+@keyframes backdropFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes backdropFadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+.backdrop-enter { animation: backdropFadeIn 0.25s ease both; }
+.backdrop-exit  { animation: backdropFadeOut 0.2s ease both; }
+
+/* ── macOS traffic-light hover glyphs ─────────────────────────────── */
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+.traffic-light:hover { filter: brightness(1.15); }
+.traffic-light:active { transform: scale(0.9); }
+.traffic-light svg {
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.traffic-light-group:hover .traffic-light svg { opacity: 1; }
+.traffic-light.tl-red    { background: #ff5f57; }
+.traffic-light.tl-yellow { background: #febc2e; }
+.traffic-light.tl-green  { background: #28c840; }
+@media (pointer: coarse) {
+  .traffic-light { width: 16px; height: 16px; }
+  .traffic-light svg { width: 10px; height: 10px; opacity: 1; }
+}
