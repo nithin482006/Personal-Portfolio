@@ -1,7 +1,8 @@
-import { forwardRef } from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { forwardRef, useState, useEffect } from 'react';
+import { Mail, Phone, MapPin, Github } from 'lucide-react';
+import { supabase, type Project } from '../lib/supabase';
 
-// Portfolio data - synced with existing components
+// Static resume data (non-project sections — unchanged)
 const resumeData = {
   name: 'Nithin Reddy M',
   title: 'Computer Science Student & Full-Stack Developer',
@@ -34,31 +35,6 @@ const resumeData = {
     },
   ],
 
-  experience: [
-    {
-      role: 'Project Lead — Smart Groundwater Level Tracking System',
-      company: 'Presidency University, Bangalore',
-      dates: 'Oct 2024 – Dec 2024',
-      type: 'Academic Project',
-      bullets: [
-        'Designed and developed an Arduino-based IoT monitoring solution integrating real-time groundwater level sensors with automated alert systems.',
-        'Created schematics, implemented embedded firmware in C/C++, and led end-to-end project execution including sensor calibration.',
-        'Delivered functional prototype enabling real-time monitoring for sustainable water management.',
-      ],
-    },
-    {
-      role: 'Front-End Web Developer — Bangalore Smiles Dental Care',
-      company: 'Freelance / Academic Project',
-      dates: 'Mar 2026',
-      type: 'Freelance',
-      bullets: [
-        'Developed and deployed a fully responsive website for a dental care clinic using HTML, CSS, and JavaScript.',
-        'Optimized performance and accessibility standards with mobile-first design approach.',
-        'Successfully launched production website improving patient engagement and mobile user experience.',
-      ],
-    },
-  ],
-
   skills: {
     'Programming Languages': ['Python', 'Java', 'JavaScript', 'PHP', 'SQL', 'C/C++'],
     'Web Development': ['React.js', 'Node.js', 'HTML5', 'CSS3', 'Responsive Design', 'Accessibility'],
@@ -77,6 +53,21 @@ const resumeData = {
 
 // ATS-optimized resume layout
 const Resume = forwardRef<HTMLDivElement>((_, ref) => {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from('projects')
+        .select('*')
+        .order('sort_order')
+        .order('created_at');
+      if (active && data) setProjects(data as Project[]);
+    })();
+    return () => { active = false; };
+  }, []);
+
   return (
     <div
       ref={ref}
@@ -136,26 +127,32 @@ const Resume = forwardRef<HTMLDivElement>((_, ref) => {
         ))}
       </section>
 
-      {/* Experience / Projects */}
+      {/* Projects (from Supabase projects table — kept in sync with GitHub) */}
       <section style={{ marginBottom: '5mm' }}>
         <SectionTitle>PROJECT EXPERIENCE</SectionTitle>
-        {resumeData.experience.map((exp, i) => (
-          <div key={i} style={{ marginBottom: '4mm' }}>
+        {projects.map((project) => (
+          <div key={project.id} style={{ marginBottom: '4mm' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <strong style={{ color: '#0a0a0f', fontSize: '10pt' }}>{exp.role}</strong>
-              <span style={{ fontSize: '8.5pt', color: '#64748b' }}>{exp.dates}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5mm' }}>
+                {project.source === 'github' && <Github size={9} color="#64748b" />}
+                <strong style={{ color: '#0a0a0f', fontSize: '10pt' }}>{project.title}</strong>
+              </div>
+              <span style={{ fontSize: '8.5pt', color: '#64748b' }}>{project.period}</span>
             </div>
             <p style={{ color: '#00aa77', fontSize: '9pt' }}>
-              {exp.company}
-              <span style={{ display: 'inline-block', marginLeft: '2mm', fontSize: '8pt', color: '#64748b', border: '0.5px solid #00aa77', padding: '0 2mm', borderRadius: '2pt' }}>
-                {exp.type}
-              </span>
+              {project.source === 'github' ? 'GitHub Repository' : 'Project'}
             </p>
-            <ul style={{ margin: '1.5mm 0 0 4mm', paddingLeft: '3mm', color: '#334155' }}>
-              {exp.bullets.map((b, j) => (
-                <li key={j} style={{ marginBottom: '1mm' }}>{b}</li>
+            <p style={{ color: '#334155', fontSize: '9pt', margin: '1.5mm 0' }}>{project.description}</p>
+            {project.impact && (
+              <p style={{ color: '#475569', fontSize: '8.5pt', fontStyle: 'italic', margin: '1mm 0' }}>{project.impact}</p>
+            )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2mm', marginTop: '1.5mm' }}>
+              {project.tags.slice(0, 6).map((t, j) => (
+                <span key={j} style={{ fontSize: '8pt', color: '#64748b', backgroundColor: '#f1f5f9', padding: '0 2mm', borderRadius: '2pt' }}>
+                  {t}
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
       </section>

@@ -2,18 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Download, Eye, Code, Shield, Cpu, Layers, CheckCircle, Github } from 'lucide-react';
 import { useResume } from '../hooks/useResume';
 import { supabase } from '../lib/supabase';
-import { PERSONAL, SKILLS, EXPERIENCE, EDUCATION, COURSES, PROJECTS, RESUME_ROLES, type ResumeRole } from '../data/portfolio';
-
-interface ResumeProject {
-  title: string;
-  description: string;
-  tech: string[];
-  period: string;
-  github_url: string | null;
-  live_url: string | null;
-  impact: string;
-  source: 'static' | 'github';
-}
+import { PERSONAL, SKILLS, EDUCATION, COURSES, RESUME_ROLES, type ResumeRole } from '../data/portfolio';
+import { supabase, type Project } from '../lib/supabase';
 
 interface ResumeGeneratorModalProps {
   isOpen: boolean;
@@ -30,7 +20,7 @@ const roleIcons: Record<ResumeRole, React.ReactNode> = {
 export default function ResumeGeneratorModal({ isOpen, onClose }: ResumeGeneratorModalProps) {
   const [selectedRole, setSelectedRole] = useState<ResumeRole>('Software Engineer');
   const [generating, setGenerating] = useState(false);
-  const [githubProjects, setGithubProjects] = useState<ResumeProject[]>([]);
+  const [dbProjects, setDbProjects] = useState<Project[]>([]);
   const resumeRef = useRef<HTMLDivElement>(null);
   const { downloadResume } = useResume();
 
@@ -42,11 +32,11 @@ export default function ResumeGeneratorModal({ isOpen, onClose }: ResumeGenerato
     (async () => {
       const { data } = await supabase
         .from('projects')
-        .select('title, description, tags, period, github_url, live_url, impact, source')
-        .eq('source', 'github')
-        .order('sort_order');
+        .select('*')
+        .order('sort_order')
+        .order('created_at');
       if (active && data) {
-        setGithubProjects(data as ResumeProject[]);
+        setDbProjects(data as Project[]);
       }
     })();
     return () => { active = false; };
@@ -191,24 +181,27 @@ export default function ResumeGeneratorModal({ isOpen, onClose }: ResumeGenerato
                     ))}
                   </section>
 
-                  {/* Highlighted Projects */}
+                  {/* Projects (from Supabase projects table — kept in sync with GitHub) */}
                   <section style={{ marginBottom: '5mm' }}>
                     <SectionTitle color={roleConfig.color}>PROJECT EXPERIENCE</SectionTitle>
-                    {PROJECTS.filter(p => roleConfig.highlightProjects.includes(p.id)).map((project, i) => (
-                      <div key={i} style={{ marginBottom: '4mm' }}>
+                    {dbProjects.map((project, i) => (
+                      <div key={project.id} style={{ marginBottom: '4mm' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                          <strong style={{ color: '#0a0a0f', fontSize: '10pt' }}>{project.title}</strong>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5mm' }}>
+                            {project.source === 'github' && <Github size={9} color="#64748b" />}
+                            <strong style={{ color: '#0a0a0f', fontSize: '10pt' }}>{project.title}</strong>
+                          </div>
                           <span style={{ fontSize: '8.5pt', color: '#64748b' }}>{project.period}</span>
                         </div>
                         <p style={{ color: roleConfig.color, fontSize: '9pt' }}>
-                          {project.type}
-                          <span style={{ display: 'inline-block', marginLeft: '2mm', fontSize: '8pt', color: '#64748b', border: `0.5px solid ${roleConfig.color}`, padding: '0 2mm', borderRadius: '2pt' }}>
-                            {project.status}
-                          </span>
+                          {project.source === 'github' ? 'GitHub Repository' : 'Project'}
                         </p>
                         <p style={{ color: '#334155', fontSize: '9pt', margin: '1.5mm 0' }}>{project.description}</p>
+                        {project.impact && (
+                          <p style={{ color: '#475569', fontSize: '8.5pt', fontStyle: 'italic', margin: '1mm 0' }}>{project.impact}</p>
+                        )}
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2mm', marginTop: '1.5mm' }}>
-                          {project.tech.slice(0, 6).map((t, j) => (
+                          {project.tags.slice(0, 6).map((t, j) => (
                             <span key={j} style={{ fontSize: '8pt', color: '#64748b', backgroundColor: '#f1f5f9', padding: '0 2mm', borderRadius: '2pt' }}>
                               {t}
                             </span>
@@ -216,36 +209,6 @@ export default function ResumeGeneratorModal({ isOpen, onClose }: ResumeGenerato
                         </div>
                       </div>
                     ))}
-
-                    {/* GitHub-synced projects */}
-                    {githubProjects.length > 0 && (
-                      <>
-                        <div style={{ height: '2mm' }} />
-                        {githubProjects.map((project, i) => (
-                          <div key={`gh-${i}`} style={{ marginBottom: '4mm' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5mm' }}>
-                                <Github size={9} color="#64748b" />
-                                <strong style={{ color: '#0a0a0f', fontSize: '10pt' }}>{project.title}</strong>
-                              </div>
-                              <span style={{ fontSize: '8.5pt', color: '#64748b' }}>{project.period}</span>
-                            </div>
-                            <p style={{ color: roleConfig.color, fontSize: '9pt' }}>GitHub Repository</p>
-                            <p style={{ color: '#334155', fontSize: '9pt', margin: '1.5mm 0' }}>{project.description}</p>
-                            {project.impact && (
-                              <p style={{ color: '#475569', fontSize: '8.5pt', fontStyle: 'italic', margin: '1mm 0' }}>{project.impact}</p>
-                            )}
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2mm', marginTop: '1.5mm' }}>
-                              {project.tech.slice(0, 6).map((t, j) => (
-                                <span key={j} style={{ fontSize: '8pt', color: '#64748b', backgroundColor: '#f1f5f9', padding: '0 2mm', borderRadius: '2pt' }}>
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    )}
                   </section>
 
                   {/* Skills */}
