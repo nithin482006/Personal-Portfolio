@@ -1,5 +1,5 @@
-import { X, Github, ExternalLink, Calendar, Tag, CheckCircle, AlertTriangle, Lightbulb, Zap, ArrowRight } from 'lucide-react';
-import { PROJECTS, type ResumeRole } from '../data/portfolio';
+import { X, Github, Calendar, Tag, CheckCircle, AlertTriangle, Lightbulb, Zap, ArrowRight } from 'lucide-react';
+import { PROJECTS } from '../data/portfolio';
 
 interface ProjectDetailModalProps {
   isOpen: boolean;

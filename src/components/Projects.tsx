@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ExternalLink, Github, Cpu, Globe, Plus, Pencil, Trash2, X, Loader2, Code2, Star, GitFork, RefreshCw, FileText, Shield } from 'lucide-react';
+import { ExternalLink, Github, Cpu, Globe, Plus, Pencil, Trash2, X, Loader2, Code2, Star, GitFork, RefreshCw, FileText, Shield, type LucideIcon } from 'lucide-react';
 import { useReveal } from '../hooks/useReveal';
 import { useAuth } from '../context/AuthContext';
 import { supabase, type Project, type GitHubRepo } from '../lib/supabase';
 import ProjectDetailModal from './ProjectDetailModal';
-import { PROJECTS } from '../data/portfolio';
 
 // ── Static (hardcoded) projects ──────────────────────────────────────────────
 
@@ -71,7 +70,7 @@ function CaseFileCard({
   live?: string | null;
   impact: string;
   status?: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   children?: React.ReactNode;
   onEdit?: () => void;
   onDelete?: () => void;

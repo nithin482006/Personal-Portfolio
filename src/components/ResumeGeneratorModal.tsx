@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Download, Eye, Code, Shield, Cpu, Layers, CheckCircle, Github } from 'lucide-react';
+import { X, Download, Code, Shield, Cpu, Layers, CheckCircle, Github } from 'lucide-react';
 import { useResume } from '../hooks/useResume';
-import { supabase } from '../lib/supabase';
 import { PERSONAL, SKILLS, EDUCATION, COURSES, RESUME_ROLES, type ResumeRole } from '../data/portfolio';
 import { supabase, type Project } from '../lib/supabase';
 
@@ -184,7 +183,7 @@ export default function ResumeGeneratorModal({ isOpen, onClose }: ResumeGenerato
                   {/* Projects (from Supabase projects table — kept in sync with GitHub) */}
                   <section style={{ marginBottom: '5mm' }}>
                     <SectionTitle color={roleConfig.color}>PROJECT EXPERIENCE</SectionTitle>
-                    {dbProjects.map((project, i) => (
+                    {dbProjects.map((project) => (
                       <div key={project.id} style={{ marginBottom: '4mm' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5mm' }}>

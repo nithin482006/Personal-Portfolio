@@ -687,7 +687,7 @@ function MobileTerminal({
 
 // ── Minimized floating chip (shared) ───────────────────────────────────────
 
-function MinimizedChip({ onRestore, onClose, isMobile }: { onRestore: () => void; onClose: () => void; isMobile: boolean }) {
+function MinimizedChip({ onRestore, onClose }: { onRestore: () => void; onClose: () => void }) {
   return (
     <div
       className={`fixed z-40 flex items-center gap-2 bottom-4 right-4 terminal-window rounded-lg shadow-neon px-3 py-2 terminal-enter-desktop`}
@@ -784,7 +784,6 @@ export default function Terminal({ isOpen, onClose, onMatrixToggle, onDownloadRe
   if (windowState === 'minimized' && !exitAnim) {
     return (
       <MinimizedChip
-        isMobile={isMobile}
         onRestore={() => setWindowState('restored')}
         onClose={animatedClose}
       />

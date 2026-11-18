@@ -1,4 +1,4 @@
-import { Briefcase, Cpu, Globe, FolderOpen } from 'lucide-react';
+import { Briefcase, Cpu, Globe } from 'lucide-react';
 import { useReveal } from '../hooks/useReveal';
 
 const experiences = [

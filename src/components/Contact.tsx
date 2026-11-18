@@ -1,4 +1,4 @@
-import { Mail, Linkedin, Github, MapPin, Phone, Terminal, Send } from 'lucide-react';
+import { Mail, Linkedin, Github, MapPin, Phone } from 'lucide-react';
 import { useReveal } from '../hooks/useReveal';
 
 const contactLinks = [

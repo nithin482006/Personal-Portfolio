@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   ArrowDown, Github, Linkedin, Mail, Shield, Download, Eye,
-  Wifi, Lock, Cpu, Activity, FolderKanban, GraduationCap, Code2,
+  Wifi, Cpu, Activity, FolderKanban, GraduationCap, Code2,
   AlertCircle, CheckCircle2, BookOpen, FileText, RefreshCw
 } from 'lucide-react';
 import MatrixRain from './MatrixRain';
