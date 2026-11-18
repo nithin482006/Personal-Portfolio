@@ -54,7 +54,7 @@ export default function AdminButton() {
       <button
         onClick={() => setOpen(true)}
         title={isAdmin ? 'Admin panel' : 'Admin login'}
-        className={`fixed bottom-[76px] right-4 z-40 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 ${
+        className={`fixed bottom-[130px] right-4 z-40 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 ${ 
           isAdmin
             ? 'bg-teal-500 hover:bg-teal-400 text-white shadow-teal-900/30'
             : 'bg-navy-900/80 backdrop-blur-sm hover:bg-navy-800 text-slate-400 hover:text-white border border-navy-700'

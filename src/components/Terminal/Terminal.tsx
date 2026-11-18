@@ -842,7 +842,7 @@ export function TerminalButton({ onOpen, isOpen, isMinimized }: TerminalButtonPr
       onClick={onOpen}
       title="Open Terminal"
       aria-label="Open terminal"
-      className={`fixed bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-2.5 rounded-lg border font-mono text-xs font-semibold transition-all duration-300 shadow-lg touch-target ${
+      className={`fixed bottom-4 right-4 z-40 flex items-center gap-2 px-4 py-2.5 rounded-lg border font-mono text-xs font-semibold transition-all duration-300 shadow-lg touch-target ${ 
         isMinimized
           ? 'bg-neon-green/30 border-neon-green text-neon-green shadow-neon animate-pulse'
           : 'bg-cyber-dark/90 border-neon-green/40 text-neon-green/80 hover:border-neon-green hover:text-neon-green hover:shadow-neon'
